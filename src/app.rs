@@ -1,8 +1,8 @@
 use std::{io};
 use std::process::Command;
 use json::*;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, MouseEvent, MouseEventKind};
-use ratatui::{DefaultTerminal, Frame};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+use ratatui::DefaultTerminal;
 use crate::api;
 
 #[derive(Debug, Default)]
@@ -29,26 +29,26 @@ impl App {
         api::get_games();
         self.get_username();
         while !self.exit {
-            terminal.draw(|frame| self.draw(frame))?;
+            terminal.draw(|frame| {
+                frame.render_widget(&*self, frame.area());
+            })?;
             self.handle_events();
         }
         Ok(())
-    }
-
-    fn draw(&self, frame: &mut Frame) {
-        frame.render_widget(self, frame.area());
     }
 
     fn handle_events(&mut self) -> io::Result<()> {
         match event::read()? {
             Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
                 self.handle_key_event(key_event)
-            }
+            },
+
             _ => {}
         };
         Ok(())
     }
 
+    // #3: Key Events
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match (&self.screen, key_event.code) {
             (_, KeyCode::Char('q')) => self.exit(),
