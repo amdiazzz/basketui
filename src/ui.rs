@@ -39,9 +39,15 @@ impl App {
 
         let separator = Line::from("─".repeat(inner.width as usize));
         
+        let error_height = if self.api_error.is_some() { 2 } else { 0 };
         let chunks = Layout::default()
             .direction(ratatui::layout::Direction::Vertical)
-            .constraints([Constraint::Length(1), Constraint::Length(1), Constraint::Min(0)])
+            .constraints([
+                Constraint::Length(1),
+                Constraint::Length(1),
+                Constraint::Length(error_height),
+                Constraint::Min(0),
+            ])
             .split(inner);
 
         // displays current day
@@ -52,8 +58,15 @@ impl App {
         Paragraph::new(separator)
             .render(chunks[1], buf);
 
+        if let Some(api_error) = &self.api_error {
+            Paragraph::new(format!("API error: {api_error}"))
+                .alignment(Alignment::Center)
+                .red()
+                .render(chunks[2], buf);
+        }
+
         // Display game grid on home screen
-        self.render_game_grid(chunks[2], buf, 6);
+        self.render_game_grid(chunks[3], buf, 6);
     }
 
     fn render_game(&self, area: Rect, buf: &mut Buffer) {
