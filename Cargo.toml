@@ -2,6 +2,11 @@
 name = "basketui"
 version = "0.1.0"
 edition = "2021"
+description = "A terminal-based NBA, NCAA, and WNBA game scores and statistics viewer built with Ratatui."
+license = "MIT"
+repository = "https://github.com/amdiazzz/basketui"
+keywords = ["nba", "basketball", "ratatui", "tui", "scores"]
+categories = ["command-line-utilities", "visualization"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,5 +17,5 @@ ratatui = "0.30.0"
 chrono = "0.4"
 json = "0.12.4"
 reqwest = { version = "0.13.3", features = ["json"] }
-tokio = "1.52.3"
+tokio = { version = "1.52.3", features = ["full"] }
 serde = { version = "1.0.228", features = ["derive"] }
