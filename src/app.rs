@@ -1,9 +1,8 @@
 use std::{io};
 use std::process::Command;
-use json::*;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::DefaultTerminal;
-use crate::api;
+use crate::api::{self, Game};
 
 #[derive(Debug, Default)]
 pub enum Screen {
@@ -16,7 +15,7 @@ pub enum Screen {
 pub struct App {
     pub screen: Screen,
     pub username: String,
-    pub games: Vec<JsonValue>, // this will be the results from our api call
+    pub games: Vec<Game>, // this will be the results from our api call
     pub home_team: String,
     pub away_team: String,
     pub home_score: u8,
@@ -26,13 +25,18 @@ pub struct App {
 
 impl App {
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
-        api::get_games();
+        // get result from tokio runtime on api::get_games()
+        self.games = tokio::runtime::Runtime::new()
+            .expect("tokio runtime")
+            .block_on(api::get_games())
+            .unwrap_or_default();
+
         self.get_username();
         while !self.exit {
             terminal.draw(|frame| {
                 frame.render_widget(&*self, frame.area());
             })?;
-            self.handle_events();
+            self.handle_events()?;
         }
         Ok(())
     }
