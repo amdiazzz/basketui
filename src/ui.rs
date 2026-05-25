@@ -57,6 +57,7 @@ impl App {
     }
 
     fn render_game(&self, area: Rect, buf: &mut Buffer) {
+        let game = &self.games[0];
         let title = Line::from(" Basketui ").bold();
         let hint = Line::from(" Backspace: back  q: quit ".dark_gray());
 
@@ -69,8 +70,8 @@ impl App {
         block.render(area, buf);
 
         // Display single selected game details
-        let home_name = if self.home_team.is_empty() { "---" } else { &self.home_team };
-        let away_name = if self.away_team.is_empty() { "---" } else { &self.away_team };
+        let home_name = &game.home_team.full_name;
+        let away_name = &game.visitor_team.full_name;
 
         let content = Layout::default()
             .direction(ratatui::layout::Direction::Vertical)
@@ -83,7 +84,7 @@ impl App {
 
         Paragraph::new(format!("Home: {}", home_name)).render(content[0], buf);
         Paragraph::new(format!("Away: {}", away_name)).render(content[1], buf);
-        Paragraph::new(format!("Score: {} - {}", self.home_score, self.away_score))
+        Paragraph::new(format!("Score: {} - {}", &game.home_team_score, &game.visitor_team_score))
             .alignment(Alignment::Center)
             .bold()
             .render(content[2], buf);
@@ -114,9 +115,9 @@ impl App {
 
     fn render_game_box(&self, area: Rect, buf: &mut Buffer, game: &Game) {
         // let box_title = format!("Game {}", game_num + 1);
-        let home = format!("HOME: {}", game.home_team.abbreviation);
-        let away = format!("HOME: {}", game.visitor_team.abbreviation);
-        let score = format!("{} - {}", game.home_team_score, game.visitor_team_score);
+        let home = format!("HOME: {}", &game.home_team.abbreviation);
+        let away = format!("HOME: {}", &game.visitor_team.abbreviation);
+        let score = format!("{} - {}", &game.home_team_score, &game.visitor_team_score);
 
         let block = Block::bordered()
             .title("Game")
