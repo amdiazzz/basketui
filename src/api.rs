@@ -1,7 +1,7 @@
 // https://api.balldontlie.io/v1/games?dates[]=<date>
 // Authorization: Bearer <API_KEY>
 
-use std::{env};
+use std::{env, ptr::null};
 use reqwest::Client;
 use chrono::{DateTime, Local};
 use serde::{Serialize, Deserialize};

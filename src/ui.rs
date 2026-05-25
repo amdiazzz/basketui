@@ -7,7 +7,7 @@ use ratatui::{
     text::Line,
     widgets::{Block, Paragraph, Widget},
 };
-use crate::app::{App, Screen};
+use crate::{api::{Game}, app::{App, Screen}};
 
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
@@ -53,10 +53,11 @@ impl App {
             .render(chunks[1], buf);
 
         // Display game grid on home screen
-        self.render_game_grid(chunks[2], buf, 6);
+        self.render_game_grid(chunks[2], buf);
     }
 
     fn render_game(&self, area: Rect, buf: &mut Buffer) {
+        let game = &self.games[0];
         let title = Line::from(" Basketui ").bold();
         let hint = Line::from(" Backspace: back  q: quit ".dark_gray());
 
@@ -69,8 +70,8 @@ impl App {
         block.render(area, buf);
 
         // Display single selected game details
-        let home_name = if self.home_team.is_empty() { "---" } else { &self.home_team };
-        let away_name = if self.away_team.is_empty() { "---" } else { &self.away_team };
+        let home_name = &game.home_team.full_name;
+        let away_name = &game.visitor_team.full_name;
 
         let content = Layout::default()
             .direction(ratatui::layout::Direction::Vertical)
@@ -83,25 +84,28 @@ impl App {
 
         Paragraph::new(format!("Home: {}", home_name)).render(content[0], buf);
         Paragraph::new(format!("Away: {}", away_name)).render(content[1], buf);
-        Paragraph::new(format!("Score: {} - {}", self.home_score, self.away_score))
+        Paragraph::new(format!("Score: {} - {}", &game.home_team_score, &game.visitor_team_score))
             .alignment(Alignment::Center)
             .bold()
             .render(content[2], buf);
     }
 
-    fn render_game_grid(&self, area: Rect, buf: &mut Buffer, num_games: usize) {
-        // Create 3 columns
+    fn render_game_grid(&self, area: Rect, buf: &mut Buffer) {
+
+        // get games from api
+        let games = &self.games;
+        let len = games.len();
+
         let cols = Layout::default()
             .direction(ratatui::layout::Direction::Horizontal)
-            .constraints(vec![Constraint::Percentage(33); 3])
+            .constraints(vec![Constraint::Percentage(33); len])
             .split(area);
 
-        // Iterate through rows (each row has 3 games)
-        for row_start in (0..num_games).step_by(3) {
+        for row_start in (0..len).step_by(3) {
             if row_start == 0 {
                 for col in 0..3 {
-                    if row_start + col < num_games {
-                        self.render_game_box(cols[col], buf, row_start + col);
+                    if row_start + col < len {
+                        self.render_game_box(cols[col], buf, &games[row_start + col]);
                     }
                 }
             }
@@ -109,14 +113,14 @@ impl App {
         }
     }
 
-    fn render_game_box(&self, area: Rect, buf: &mut Buffer, game_num: usize) {
-        let box_title = format!("Game {}", game_num + 1);
-        let home = format!("HOME: {}", if self.home_team.is_empty() { "---" } else { &self.home_team });
-        let away = format!("AWAY: {}", if self.away_team.is_empty() { "---" } else { &self.away_team });
-        let score = format!("{} - {}", self.home_score, self.away_score);
+    fn render_game_box(&self, area: Rect, buf: &mut Buffer, game: &Game) {
+        // let box_title = format!("Game {}", game_num + 1);
+        let home = format!("HOME: {}", &game.home_team.abbreviation);
+        let away = format!("HOME: {}", &game.visitor_team.abbreviation);
+        let score = format!("{} - {}", &game.home_team_score, &game.visitor_team_score);
 
         let block = Block::bordered()
-            .title(box_title)
+            .title("Game")
             .border_set(border::ROUNDED);
 
         let inner = block.inner(area);
