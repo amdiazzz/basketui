@@ -2,6 +2,13 @@
 name = "basketui"
 version = "0.1.0"
 edition = "2021"
+description = "A terminal UI for browsing NBA games from the balldontlie API"
+license = "MIT"
+repository = "https://github.com/amdiazzz/basketui"
+homepage = "https://github.com/amdiazzz/basketui"
+keywords = ["tui", "nba", "basketball", "terminal", "ratatui", "balldontlie"]
+categories = ["command-line-utilities", "user-interface"]
+authors = ["Alex Diaz <amdiazzz@users.noreply.github.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
